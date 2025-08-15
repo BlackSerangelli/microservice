@@ -254,9 +254,9 @@ Las contribuciones son bienvenidas. Por favor:
 4. Push a la rama
 5. Abre un Pull Request
 
-## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT.
+### Evidencia: Funcionamiento del LLm
+![Evidencia 1](screenshots/evidencia1.png)
 
 ## 🆘 Soporte
 
