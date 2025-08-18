@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const userInput = document.getElementById('userInput');
     const statusSpan = document.getElementById('status');
 
-    // Verificar conexión al cargar
+    // Verificar conexión al cargar (usa el proxy del backend)
     checkConnection();
 
     chatForm.addEventListener('submit', function(e) {
@@ -13,20 +13,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function checkConnection() {
-        fetch('http://localhost:11434/api/tags')
+        // Primero intentamos verificar a través del proxy local
+        fetch('/api/respuesta')
             .then(response => {
                 if (response.ok) {
-                    statusSpan.textContent = 'Estado: Conectado a Ollama';
+                    statusSpan.textContent = 'Estado: Backend activo (proxy)';
                     statusSpan.style.color = '#4caf50';
                 } else {
-                    statusSpan.textContent = 'Estado: Error de conexión';
+                    statusSpan.textContent = 'Estado: Backend no disponible';
                     statusSpan.style.color = '#f44336';
                 }
             })
-            .catch(error => {
-                statusSpan.textContent = 'Estado: Sin conexión a Ollama';
+            .catch(err => {
+                // Si falla, indicamos estado de desconexión
+                statusSpan.textContent = 'Estado: Backend no responde';
                 statusSpan.style.color = '#f44336';
-                console.error('Error:', error);
+                console.error('Error:', err);
             });
     }
 
@@ -38,33 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
         addMessage(message, 'user');
         userInput.value = '';
 
-        // Llamar a la API de Ollama
-        callOllamaAPI(message);
+        // Llamar a la API a través del proxy backend
+        callBackendAPI(message);
     }
 
-    function callOllamaAPI(message) {
+    function callBackendAPI(message) {
         // Mostrar indicador de carga
         const loadingMessage = addMessage('⏳ Pensando...', 'assistant');
-        
+
         const requestBody = {
-            model: 'deepseek-coder',
-            messages: [
-                {
-                    role: 'user',
-                    content: message
-                }
-            ],
-            stream: false,
-            options: {
-                temperature: 0.1,
-                top_p: 0.1,
-                top_k: 10,
-                num_predict: 100,
-                repeat_penalty: 1.0
-            }
+            message: message
         };
 
-        fetch('http://localhost:11434/api/chat', {
+        fetch('/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -73,19 +61,27 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json().then(err => { throw err; });
             }
             return response.json();
         })
         .then(data => {
-            const response = data.message.content;
-            // Reemplazar el mensaje de carga con la respuesta real
-            loadingMessage.textContent = `${response}\n\n`;
+            // Manejar distintos formatos de respuesta
+            let text = '';
+            if (data && data.message && data.message.content) {
+                text = data.message.content;
+            } else if (data && data.response) {
+                text = data.response;
+            } else {
+                text = JSON.stringify(data);
+            }
+
+            loadingMessage.textContent = `${text}\n\n`;
             loadingMessage.className = 'message assistant';
         })
         .catch(error => {
-            // Reemplazar el mensaje de carga con el error
-            loadingMessage.textContent = 'Error: No se pudo conectar con Ollama. Verifica que esté ejecutándose en localhost:11434';
+            const errMsg = (error && (error.error || error.message)) || 'Error desconocido al contactar el backend';
+            loadingMessage.textContent = `Error: ${errMsg}`;
             loadingMessage.className = 'message assistant error';
             console.error('Error:', error);
         });
@@ -106,4 +102,4 @@ document.addEventListener('DOMContentLoaded', function() {
         // Agregar mensaje de confirmación
         addMessage('Chat limpiado', 'assistant');
     };
-}); 
+});
