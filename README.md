@@ -7,7 +7,7 @@ Una aplicación web simple y rápida para chatear con el modelo **DeepSeek Coder
 - 🚀 **Chat en tiempo real** con DeepSeek Coder
 - ⚡ **Respuestas optimizadas** para mayor velocidad
 - 💻 **Especializado en programación** y desarrollo
-- 🎨 **Interfaz simple y funcional** 
+- 🎨 **Interfaz simple y funcional**
 - 📱 **Diseño responsive** para móviles y escritorio
 - 🔗 **Conexión directa** a Ollama API
 - 🗑️ **Función para limpiar** el historial del chat
@@ -256,7 +256,7 @@ Las contribuciones son bienvenidas. Por favor:
 
 
 ### Evidencia: Funcionamiento del LLm
-![Evidencia 1](screenshots/evidencia1.png)
+![Evidencia](screenshots/evidencia.png)
 
 ## 🆘 Soporte
 
@@ -277,4 +277,4 @@ Si tienes problemas o preguntas:
 
 **¡Disfruta programando con DeepSeek Coder! 🚀💻**
 
-*Desarrollado con ❤️ para la comunidad de desarrolladores* 
+*Desarrollado con ❤️ para la comunidad de desarrolladores*
